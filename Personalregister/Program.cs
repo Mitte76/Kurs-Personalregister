@@ -2,6 +2,8 @@
 {
     internal class Program
     {
+        static int personsPerPage = 12;
+
         static void Main()
         {
             string? input;
@@ -9,6 +11,15 @@
 
             //List<Person> persons = [];
             List<Person> persons = [
+                new Person("John", "Doe", 50000),
+                new Person("Anna", "Andersson", 42000),
+                new Person("Erik", "Svensson", 55000),
+                new Person("Maria", "Johansson", 48000),
+                new Person("Peter", "Karlsson", 62000),
+                new Person("Lisa", "Nilsson", 39000),
+                new Person("Johan", "Larsson", 51000),
+                new Person("Emma", "Lindberg", 47000),
+                new Person("Daniel", "Bergström", 58000),
                 new Person("John", "Doe", 50000),
                 new Person("Anna", "Andersson", 42000),
                 new Person("Erik", "Svensson", 55000),
@@ -26,7 +37,7 @@
                 Console.WriteLine("Meny:");
                 Console.WriteLine("1. Lägg till person");
                 Console.WriteLine("2. Visa personer");
-                Console.WriteLine("3. Editera person");
+                Console.WriteLine("3. Redigera person");
                 Console.WriteLine("4. Ta bort person");
                 Console.WriteLine("5. Avsluta");
                 input = Console.ReadLine();
@@ -54,7 +65,10 @@
                         else
                         {
                             SortStaff(persons);
-                            Console.WriteLine();
+                            Console.WriteLine("Tryck på valfri tangent för att fortsätta.");
+
+                            Console.ReadKey(true);
+                            Console.Clear();
                         }
                         break;
                     case "3":
@@ -65,6 +79,7 @@
                         }
                         else
                         {
+                            SortStaff(persons);
                             SelectPersonToEdit(persons);
                         }
                         break;
@@ -83,6 +98,7 @@
                         exit = true;
                         break;
                     default:
+                        Console.Clear();
                         Console.WriteLine("Ogiltig inmatning. Försök igen.");
 
                         break;
@@ -224,9 +240,6 @@
                 Console.Clear();
                 return;
             }
-            //if (input != null && int.TryParse(input, out int numberToDelete))
-            //{
-            //    Person person = persons[numberToDelete - 1];
             if (input != null && int.TryParse(input, out int idToDelete))
             {
                 Person? person = persons.FirstOrDefault(p => p.ID == idToDelete);
@@ -254,9 +267,7 @@
         }
         static void SelectPersonToEdit(List<Person> persons)
         {
-
-            SortStaff(persons);
-            Console.WriteLine("Välj person att editera (exit för att avbryta)");
+            Console.WriteLine("Välj person att redigera (exit för att avbryta)");
 
             string? input = Console.ReadLine();
             if (input == "exit")
@@ -264,11 +275,24 @@
                 Console.Clear();
                 return;
             }
-
-            if (input != null && int.TryParse(input, out int numberToEdit))
+            if (input != null && int.TryParse(input, out int idToEdit))
             {
-                Person person = persons[numberToEdit - 1];
+                Person? person = persons.FirstOrDefault(p => p.ID == idToEdit);
+
+                if (person == null)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Ingen person hittades med det ID:t.");
+                    PrintStaff(persons);
+                    SelectPersonToEdit(persons);
+                    return;
+                }
+
                 EditPerson(person);
+            }
+            else
+            {
+                SelectPersonToEdit(persons);
             }
         }
 
@@ -285,7 +309,6 @@
             {
                 case "1":
                     persons.Sort((p1, p2) => string.Compare(p1.FirstName, p2.FirstName));
-
                     PrintStaff(persons);
                     break;
                 case "2":
@@ -301,7 +324,7 @@
                     PrintStaff(persons);
                     break;
                 default:
-                    Console.WriteLine("Ogiltig inmatning. Försök igen.");
+                    Console.Clear();
                     SortStaff(persons);
                     break;
             }
@@ -309,11 +332,36 @@
 
         static void PrintStaff(List<Person> persons)
         {
-
             int counter = 1;
+            bool first = true;
+
             foreach (var person in persons)
             {
-                PrintPerson(person, counter == 1, counter == persons.Count);
+                PrintPerson(person, first, (counter == persons.Count || counter % personsPerPage == 0));
+                first = false;
+                if (counter % personsPerPage == 0 || counter >= persons.Count)
+                {
+
+                    if(counter < persons.Count)
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine("Tryck på valfri tangent för att fortsätta. x för att avsluta");
+
+                        char key = Console.ReadKey(true).KeyChar;
+
+                        if (key == 'x')
+                        {
+                            break;
+                        }
+                    }
+
+                    if(counter < persons.Count)
+                    {
+                        Console.Clear();
+                    }
+                    first = true;
+                }
+
                 counter++;
             }
         }
