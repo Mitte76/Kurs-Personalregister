@@ -4,7 +4,7 @@
     {
         static void Main(string[] args)
         {
-            String? input = "";
+            string? input;
             bool exit = false;
 
             List<Person> persons = [];
@@ -25,9 +25,11 @@
                         if (person != null)
                         {
                             persons.Add(person);
+                            Console.Clear();
                             PrintPerson(person);
+                            Console.WriteLine();
                         }
-                        continue;
+                        break;
                     case "2":
                         if (persons.Count == 0)
                         {
@@ -35,16 +37,18 @@
                         }
                         else
                         {
+                            Console.Clear();
                             PrintStaff(persons);
+                            Console.WriteLine();
                         }
-                        continue;
+                        break;
                     case "3":
                         exit = true;
                         break;
                     default:
                         Console.WriteLine("Ogiltig inmatning. Försök igen.");
 
-                        continue;
+                        break;
                 }
 
             }
@@ -53,73 +57,76 @@
 
         }
 
+
         static Person? AddPerson()
         {
             Person person = new();
-            bool isValid = false;
-            Step currentStep = Step.Name;
-            Console.WriteLine("Ange för och Efternamn");
-            String? input = Console.ReadLine();
+            Console.WriteLine("Ange för och Efternamn (exit för att avsluta):");
+            string? input = Console.ReadLine();
 
-            while (input != "exit" || !isValid)
+            while (true)
             {
-                if(input == null)
+                if (input == "exit") return null;
+
+                if (input == null)
                 {
                     Console.WriteLine("Ogiltig inmatning. Försök igen.");
                     input = Console.ReadLine();
                     continue;
                 }
-                switch (currentStep)
+                string[] nameParts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (nameParts.Length != 2)
                 {
-                    case Step.Name:
-                        String[] nameParts = input.Split(' ');
-
-                        if (nameParts.Length != 2)
-                        {
-                            Console.WriteLine("Ogiltig inmatning. Ange både för och efternamn.");
-                            input = Console.ReadLine();
-                            continue;
-                        }
-                        person.FirstName = nameParts[0];
-                        person.LastName = nameParts[1];
-                        currentStep++;
-                        continue;
-                    case Step.Salary:
-                        Console.WriteLine("Ange lön (heltal):");
-                        input = Console.ReadLine();
-                        if (!int.TryParse(input, out int salary) || salary < 0)
-                        {
-                            Console.WriteLine("Ogiltig inmatning. Ange en giltig lön (heltal).");
-                            input = Console.ReadLine();
-                            continue;
-                        }
-                        person.Salary = salary;
-                        currentStep++;
-                        continue;
-                    case Step.Finished:
-                        return person;
-                    default:
-                        continue;
+                    Console.WriteLine("Ogiltig inmatning. Ange både för och efternamn. (exit för att avsluta)");
+                    input = Console.ReadLine();
+                    continue;
                 }
-
+                person.FirstName = nameParts[0];
+                person.LastName = nameParts[1];
+                break;
 
             }
 
-            return null;
+            Console.WriteLine("Ange lön (heltal, exit för att avsluta):");
+            input = Console.ReadLine();
+
+            while (true)
+            {
+                if (input == "exit") return null;
+
+                if (!int.TryParse(input, out int salary) || salary < 0)
+                {
+                    Console.WriteLine("Ogiltig inmatning. Ange lön (heltal, exit för att avsluta):");
+                    continue;
+                }
+                person.Salary = salary;
+                return person;
+            }
+
         }
+
+
 
         static void PrintStaff(List<Person> persons)
         {
+            int counter = 1;
             foreach (var person in persons)
             {
-                PrintPerson(person);
+                PrintPerson(person, counter++);
             }
         }
 
 
-        static void PrintPerson(Person person)
+        static void PrintPerson(Person person, int? index = null)
         {
-            Console.WriteLine($"Name: {person.FirstName} {person.LastName}, Lön: {person.Salary}");
+            if (index.HasValue)
+            {
+                Console.WriteLine($"{index.Value}: Name: {person.FirstName} {person.LastName}, Lön: {person.Salary}");
+            }
+            else
+            {
+                Console.WriteLine($"Name: {person.FirstName} {person.LastName}, Lön: {person.Salary}");
+            }
         }
 
 
@@ -131,12 +138,4 @@
         public string LastName { get; set; } = "";
         public int Salary { get; set; }
     }
-
-    enum Step
-    {
-        Name = 1,
-        Salary = 2,
-        Finished = 3,
-    }
-
 }
