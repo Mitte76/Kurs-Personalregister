@@ -2,12 +2,24 @@
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             string? input;
             bool exit = false;
 
-            List<Person> persons = [new Person("John", "Doe", 50000)];
+            //List<Person> persons = [];
+            List<Person> persons = [
+                new Person("John", "Doe", 50000),
+                new Person("Anna", "Andersson", 42000),
+                new Person("Erik", "Svensson", 55000),
+                new Person("Maria", "Johansson", 48000),
+                new Person("Peter", "Karlsson", 62000),
+                new Person("Lisa", "Nilsson", 39000),
+                new Person("Johan", "Larsson", 51000),
+                new Person("Emma", "Lindberg", 47000),
+                new Person("Daniel", "Bergström", 58000),
+                new Person("Sara", "Gustafsson", 45000)
+            ];
 
             while (!exit)
             {
@@ -40,7 +52,7 @@
                         }
                         else
                         {
-                            PrintStaff(persons);
+                            SortStaff(persons);
                             Console.WriteLine();
                         }
                         break;
@@ -69,11 +81,12 @@
 
         static Person? AddPerson()
         {
-            Person person = new();
             Console.Clear();
             Console.WriteLine("Ange för och Efternamn (skriv exit för att avbryta):");
             string? input = Console.ReadLine();
-
+            string? firstName;
+            string? lastName;
+            int? salary;
             while (true)
             {
                 if (input == "exit")
@@ -96,8 +109,8 @@
                     input = Console.ReadLine();
                     continue;
                 }
-                person.FirstName = nameParts[0];
-                person.LastName = nameParts[1];
+                firstName = nameParts[0];
+                lastName = nameParts[1];
                 break;
 
             }
@@ -109,14 +122,21 @@
             {
                 if (input == "exit") return null;
 
-                if (!int.TryParse(input, out int salary) || salary < 0)
+                if (!int.TryParse(input, out int salaryOut) || salaryOut < 0)
                 {
                     Console.WriteLine("Ogiltig inmatning. Ange lön (heltal, exit för att avsluta):");
                     input = Console.ReadLine();
                     continue;
                 }
-                person.Salary = salary;
-                return person;
+                salary = salaryOut;
+
+                if(salary.HasValue && firstName != null && lastName != null)
+                {
+                    Person person = new(firstName, lastName, salary.Value);
+
+                    return person;
+                }
+                return null;
             }
 
         }
@@ -124,8 +144,8 @@
         static void SelectPersonToEdit(List<Person> persons)
         {
 
+            SortStaff(persons);
             Console.WriteLine("Välj person att editera (exit för att avbryta)");
-            PrintStaff(persons);
 
             string? input = Console.ReadLine();
             if (input == "exit")
@@ -204,8 +224,44 @@
             }
         }
 
+        static void SortStaff(List<Person> persons)
+        {
+            Console.WriteLine("Sortera efter:");
+            Console.WriteLine("1. Förnamn");
+            Console.WriteLine("2. Efternamn");
+            Console.WriteLine("3. Lön");
+            Console.WriteLine("4. ID");
+            string? input = Console.ReadLine();
+
+            switch (input)
+            {
+                case "1":
+                    persons.Sort((p1, p2) => string.Compare(p1.FirstName, p2.FirstName));
+
+                    PrintStaff(persons);
+                    break;
+                case "2":
+                    persons.Sort((p1, p2) => string.Compare(p1.LastName, p2.LastName));
+                    PrintStaff(persons);
+                    break;
+                case "3":
+                    persons.Sort((p1, p2) => p1.Salary.CompareTo(p2.Salary));
+                    PrintStaff(persons);
+                    break;
+                case "4":
+                    persons.Sort((p1, p2) => p1.ID.CompareTo(p2.ID));
+                    PrintStaff(persons);
+                    break;
+                default:
+                    Console.WriteLine("Ogiltig inmatning. Försök igen.");
+                    SortStaff(persons);
+                    break;
+            }
+        }
+
         static void PrintStaff(List<Person> persons)
         {
+
             int counter = 1;
             foreach (var person in persons)
             {
@@ -218,14 +274,14 @@
         static void PrintPerson(Person person, int? index = null, bool underline = false)
         {
 
-            string fullString = "";
+            string fullString;
             if (index.HasValue)
             {
-                fullString = $"{index.Value}: Namn: {person.FirstName} {person.LastName}, Lön: {person.Salary}";
+                fullString = $"{index.Value}: Namn: {person.FirstName} {person.LastName}, Lön: {person.Salary}, ID: {person.ID}";
             }
             else
             {
-                fullString = $"Namn: {person.FirstName} {person.LastName}, Lön: {person.Salary}";
+                fullString = $"Namn: {person.FirstName} {person.LastName}, Lön: {person.Salary}, ID: {person.ID}";
             }
 
             if (underline)
@@ -242,22 +298,13 @@
 
     }
 
-    internal class Person
+    internal class Person(string firstName, string lastName, int salary)
     {
-        public Person(string firstName, string lastName, int salary)
-        {
-            FirstName = firstName;
-            LastName = lastName;
-            Salary = salary;
-        }
-
-
-        public Person()
-        {
-        }
-
-        public string FirstName { get; set; } = "";
-        public string LastName { get; set; } = "";
-        public int Salary { get; set; }
+        private static int nextId = 1;
+        public string FirstName { get; set; } = firstName;
+        public string LastName { get; set; } = lastName;
+        public int Salary { get; set; } = salary;
+        public int ID { get; } = nextId++;
     }
+
 }
