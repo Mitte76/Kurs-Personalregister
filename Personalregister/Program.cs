@@ -27,7 +27,8 @@
                 Console.WriteLine("1. Lägg till person");
                 Console.WriteLine("2. Visa personer");
                 Console.WriteLine("3. Editera person");
-                Console.WriteLine("4. Avsluta");
+                Console.WriteLine("4. Ta bort person");
+                Console.WriteLine("5. Avsluta");
                 input = Console.ReadLine();
 
                 switch (input)
@@ -40,7 +41,7 @@
                             persons.Add(person);
                             Console.Clear();
                             Console.WriteLine("Person tillagd:");
-                            PrintPerson(person, underline: true);
+                            PrintPerson(person, first: true, underline: true);
                             Console.WriteLine();
                         }
                         break;
@@ -68,6 +69,17 @@
                         }
                         break;
                     case "4":
+                        Console.Clear();
+                        if (persons.Count == 0)
+                        {
+                            Console.WriteLine("Inga personer att visa.");
+                        }
+                        else
+                        {
+                            DeletePerson(persons);
+                        }
+                        break;
+                    case "5":
                         exit = true;
                         break;
                     default:
@@ -94,7 +106,6 @@
                     Console.Clear();
                     return null;
                 }
-
 
                 if (input == null)
                 {
@@ -130,7 +141,7 @@
                 }
                 salary = salaryOut;
 
-                if(salary.HasValue && firstName != null && lastName != null)
+                if (salary.HasValue && firstName != null && lastName != null)
                 {
                     Person person = new(firstName, lastName, salary.Value);
 
@@ -140,27 +151,6 @@
             }
 
         }
-
-        static void SelectPersonToEdit(List<Person> persons)
-        {
-
-            SortStaff(persons);
-            Console.WriteLine("Välj person att editera (exit för att avbryta)");
-
-            string? input = Console.ReadLine();
-            if (input == "exit")
-            {
-                Console.Clear();
-                return;
-            }
-
-            if (input != null && int.TryParse(input, out int numberToEdit))
-            {
-                Person person = persons[numberToEdit - 1];
-                EditPerson(person);
-            }
-        }
-
 
         static void EditPerson(Person person)
         {
@@ -224,6 +214,64 @@
             }
         }
 
+        static void DeletePerson(List<Person> persons)
+        {
+            SortStaff(persons);
+            Console.WriteLine("Välj person att ta bort (exit för att avbryta)");
+            string? input = Console.ReadLine();
+            if (input == "exit")
+            {
+                Console.Clear();
+                return;
+            }
+            //if (input != null && int.TryParse(input, out int numberToDelete))
+            //{
+            //    Person person = persons[numberToDelete - 1];
+            if (input != null && int.TryParse(input, out int idToDelete))
+            {
+                Person? person = persons.FirstOrDefault(p => p.ID == idToDelete);
+
+                if (person == null)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Ingen person hittades med det ID:t.");
+                    return;
+                }
+
+                Console.WriteLine($"Är du säker på att du vill ta bort {person.FirstName} {person.LastName}? (ja/nej)");
+                string? confirmation = Console.ReadLine();
+                if (confirmation != null && confirmation.ToLower() != "ja")
+                {
+                    Console.Clear();
+                    Console.WriteLine("Borttagning avbruten.");
+                    return;
+                }
+                persons.Remove(person);
+                Console.Clear();
+                Console.WriteLine($"Person borttagen: {person.FirstName} {person.LastName}, Lön: {person.Salary}, ID: {person.ID}");
+                Console.WriteLine();
+            }
+        }
+        static void SelectPersonToEdit(List<Person> persons)
+        {
+
+            SortStaff(persons);
+            Console.WriteLine("Välj person att editera (exit för att avbryta)");
+
+            string? input = Console.ReadLine();
+            if (input == "exit")
+            {
+                Console.Clear();
+                return;
+            }
+
+            if (input != null && int.TryParse(input, out int numberToEdit))
+            {
+                Person person = persons[numberToEdit - 1];
+                EditPerson(person);
+            }
+        }
+
         static void SortStaff(List<Person> persons)
         {
             Console.WriteLine("Sortera efter:");
@@ -232,7 +280,7 @@
             Console.WriteLine("3. Lön");
             Console.WriteLine("4. ID");
             string? input = Console.ReadLine();
-
+            Console.Clear();
             switch (input)
             {
                 case "1":
@@ -265,36 +313,28 @@
             int counter = 1;
             foreach (var person in persons)
             {
-                PrintPerson(person, counter, counter == persons.Count);
+                PrintPerson(person, counter == 1, counter == persons.Count);
                 counter++;
             }
         }
 
-
-        static void PrintPerson(Person person, int? index = null, bool underline = false)
+        static void PrintPerson(Person person, bool first = false, bool underline = false)
         {
-
             string fullString;
-            if (index.HasValue)
-            {
-                fullString = $"{index.Value}: Namn: {person.FirstName} {person.LastName}, Lön: {person.Salary}, ID: {person.ID}";
-            }
-            else
-            {
-                fullString = $"Namn: {person.FirstName} {person.LastName}, Lön: {person.Salary}, ID: {person.ID}";
-            }
 
-            if (underline)
+            fullString = $"  {person.ID,-3}    {person.FirstName,-16} {person.LastName,-20} {person.Salary,-7}";
+
+            if (first)
             {
-                Console.WriteLine(fullString);
+                Console.WriteLine($"  {"ID",-3}    {"Förnamn",-16} {"Efternamn",-20} {"Lön",-7}");
                 Console.WriteLine(new string('-', fullString.Length));
             }
-            else
-            {
-                Console.WriteLine(fullString);
-            }
-        }
 
+            Console.WriteLine(fullString);
+
+            if (underline)
+                Console.WriteLine(new string('-', fullString.Length));
+        }
 
     }
 
