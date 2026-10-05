@@ -2,7 +2,7 @@
 {
     internal class Program
     {
-        static int personsPerPage = 12;
+        static int personsPerPage = 20;
 
         static void Main()
         {
@@ -10,7 +10,10 @@
             bool exit = false;
 
             //List<Person> persons = [];
-            List<Person> persons = [
+
+
+            List<Person> persons =
+            [
                 new Person("John", "Doe", 50000),
                 new Person("Anna", "Andersson", 42000),
                 new Person("Erik", "Svensson", 55000),
@@ -20,16 +23,37 @@
                 new Person("Johan", "Larsson", 51000),
                 new Person("Emma", "Lindberg", 47000),
                 new Person("Daniel", "Bergström", 58000),
-                new Person("John", "Doe", 50000),
-                new Person("Anna", "Andersson", 42000),
-                new Person("Erik", "Svensson", 55000),
-                new Person("Maria", "Johansson", 48000),
-                new Person("Peter", "Karlsson", 62000),
-                new Person("Lisa", "Nilsson", 39000),
-                new Person("Johan", "Larsson", 51000),
-                new Person("Emma", "Lindberg", 47000),
-                new Person("Daniel", "Bergström", 58000),
-                new Person("Sara", "Gustafsson", 45000)
+                new Person("Sara", "Gustafsson", 45000),
+                new Person("Mikael", "Persson", 53000),
+                new Person("Sofia", "Olsson", 44000),
+                new Person("Anders", "Lindström", 61000),
+                new Person("Elin", "Hansson", 41000),
+                new Person("Marcus", "Viklund", 57000),
+                new Person("Julia", "Björk", 49000),
+                new Person("Oscar", "Sandberg", 52000),
+                new Person("Ida", "Lundberg", 46000),
+                new Person("Fredrik", "Ekström", 59000),
+                new Person("Karin", "Wallin", 43000),
+                new Person("Victor", "Nyström", 64000),
+                new Person("Malin", "Holm", 40000),
+                new Person("Simon", "Bergman", 56000),
+                new Person("Nina", "Forsberg", 47000),
+                new Person("Robert", "Lund", 63000),
+                new Person("Camilla", "Mattsson", 45000),
+                new Person("Patrik", "Sjöberg", 54000),
+                new Person("Therese", "Wikström", 48000),
+                new Person("Niklas", "Ström", 60000),
+                new Person("Louise", "Åkesson", 42000),
+                new Person("Henrik", "Dahlberg", 51000),
+                new Person("Frida", "Engström", 55000),
+                new Person("Martin", "Norberg", 49000),
+                new Person("Jenny", "Berg", 46000),
+                new Person("Alexander", "Lind", 67000),
+                new Person("Rebecca", "Edlund", 44000),
+                new Person("Gustav", "Holmberg", 58000),
+                new Person("Caroline", "Eklund", 53000),
+                new Person("Sebastian", "Öberg", 62000),
+                new Person("Hanna", "Rosén", 41000)
             ];
 
             while (!exit)
@@ -64,10 +88,7 @@
                         }
                         else
                         {
-                            SortStaff(persons);
-                            Console.WriteLine("Tryck på valfri tangent för att fortsätta.");
-
-                            Console.ReadKey(true);
+                            SortStaff(persons, true);
                             Console.Clear();
                         }
                         break;
@@ -177,7 +198,7 @@
                 Console.WriteLine($"1. Förnamn ({person.FirstName})");
                 Console.WriteLine($"2. Efternamn ({person.LastName})");
                 Console.WriteLine($"3. Lön ({person.Salary})");
-                Console.WriteLine("4. Avbryt");
+                Console.WriteLine("4. Backa");
 
                 string? input = Console.ReadLine();
 
@@ -265,7 +286,7 @@
                 Console.WriteLine();
             }
         }
-        static void SelectPersonToEdit(List<Person> persons)
+        static void SelectPersonToEdit(List<Person> persons, bool pauseAtEnd = false)
         {
             Console.WriteLine("Välj person att redigera (exit för att avbryta)");
 
@@ -283,8 +304,8 @@
                 {
                     Console.Clear();
                     Console.WriteLine("Ingen person hittades med det ID:t.");
-                    PrintStaff(persons);
-                    SelectPersonToEdit(persons);
+                    PrintStaff(persons, pauseAtEnd);
+                    SelectPersonToEdit(persons, pauseAtEnd);
                     return;
                 }
 
@@ -292,11 +313,11 @@
             }
             else
             {
-                SelectPersonToEdit(persons);
+                SelectPersonToEdit(persons, pauseAtEnd);
             }
         }
 
-        static void SortStaff(List<Person> persons)
+        static void SortStaff(List<Person> persons, bool pauseAtEnd = false)
         {
             Console.WriteLine("Sortera efter:");
             Console.WriteLine("1. Förnamn");
@@ -309,28 +330,28 @@
             {
                 case "1":
                     persons.Sort((p1, p2) => string.Compare(p1.FirstName, p2.FirstName));
-                    PrintStaff(persons);
+                    PrintStaff(persons, pauseAtEnd);
                     break;
                 case "2":
                     persons.Sort((p1, p2) => string.Compare(p1.LastName, p2.LastName));
-                    PrintStaff(persons);
+                    PrintStaff(persons, pauseAtEnd);
                     break;
                 case "3":
                     persons.Sort((p1, p2) => p1.Salary.CompareTo(p2.Salary));
-                    PrintStaff(persons);
+                    PrintStaff(persons, pauseAtEnd);
                     break;
                 case "4":
                     persons.Sort((p1, p2) => p1.ID.CompareTo(p2.ID));
-                    PrintStaff(persons);
+                    PrintStaff(persons, pauseAtEnd);
                     break;
                 default:
                     Console.Clear();
-                    SortStaff(persons);
+                    SortStaff(persons, pauseAtEnd);
                     break;
             }
         }
 
-        static void PrintStaff(List<Person> persons)
+        static void PrintStaff(List<Person> persons, bool pauseAtEnd = false)
         {
             int counter = 1;
             bool first = true;
@@ -342,7 +363,7 @@
                 if (counter % personsPerPage == 0 || counter >= persons.Count)
                 {
 
-                    if(counter < persons.Count)
+                    if (counter < persons.Count)
                     {
                         Console.WriteLine();
                         Console.WriteLine("Tryck på valfri tangent för att fortsätta. x för att avsluta");
@@ -353,9 +374,13 @@
                         {
                             break;
                         }
+                    } else if(pauseAtEnd)
+                    {
+                        Console.WriteLine("Tryck på valfri tangent för att fortsätta.");
+                        Console.ReadKey(true);
                     }
 
-                    if(counter < persons.Count)
+                    if (counter < persons.Count)
                     {
                         Console.Clear();
                     }
